@@ -1,16 +1,16 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const createError = require('http-errors');
-const bcrypt = require('bcrypt');
+const createError = require("http-errors");
+const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const User = require('../models/user');
+const User = require("../models/user");
 
 // HELPER FUNCTIONS
 const {
   isLoggedIn,
   isNotLoggedIn,
-  validationLoggin,
-} = require('../helpers/middlewares');
+  validationLoggin
+} = require("../helpers/middlewares");
 
 // GET '/auth/me'
 //  - check if the user IS logged in using helper function (check if session exists)
@@ -40,3 +40,5 @@ const {
 // GET '/auth/private'   --> Only for testing - Same as /me but it returns a message instead
 //  - check if the user IS logged in using helper function (check if session exists)
 //  - set status code and send the json message response back
+
+module.exports = router;
