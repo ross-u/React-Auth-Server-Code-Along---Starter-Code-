@@ -17,10 +17,10 @@ mongoose
   .connect(process.env.MONGODB_URI, {
     keepAlive: true,
     useNewUrlParser: true,
-    reconnectTries: Number.MAX_VALUE,
+    useUnifiedTopology: true
   })
-  .then( () => console.log(`Connected to database`))
-  .catch( (err) => console.error(err));
+  .then(() => console.log(`Connected to database`))
+  .catch((err) => console.error(err));
 
 
 // EXPRESS SERVER INSTANCE
@@ -56,7 +56,7 @@ app.use(                      //                                  ║   ⬆ 🍪
     secret: process.env.SECRET_SESSION,
     resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 24 * 60 * 60 * 1000,},
+    cookie: { maxAge: 24 * 60 * 60 * 1000, },
   }),
 );//    ║                 ⇈ 
 //      ║                 ║
