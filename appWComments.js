@@ -9,7 +9,7 @@ const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
 require('dotenv').config();
 
-const auth = require('./routes/auth');
+const authRouter = require('./routes/auth.router');
 
 
 // MONGOOSE CONNECTION
@@ -40,23 +40,23 @@ app.use(
 //      ║     SESSION                                             ║
 //      ║    MIDDLEWARE                                           ║
 //      ║                                                         ║
-//      ║   checks if cookie with session id exists on the        ║
+//      ║   Checks if cookie with session id exists on the        ║
 //      ║   HTTP request and if it does it verifies               ║
 //      ║   it, and gets the user data from                       ║
 //      ║   the sessions storage and assigns                      ║
 //      ║   it to `req.session.currentUser`                       ║
 //      ║                                                         ║
-//      ⇊      🍪.sessionId  ❓                                   ║
+//      ⇊      🍪.sessionId   ❓                                   ║
 app.use(                      //                                  ║   ⬆ 🍪
   session({                   //                                  ║   
     store: new MongoStore({   //                                  ║
-      mongooseConnection: mongoose.connection,//      session checks if `req.session.currentUser` exists
-      ttl: 24 * 60 * 60, // 1 day                     and if it does it sets a cookie 🍪 on the headers
-    }),                  //                           with the session id 
+      mongooseConnection: mongoose.connection,  //    SESSION MIDDLEWARE checks if `req.session.currentUser` was set.
+      ttl: 30 * 24 * 60 * 60,  // 30 days             If `req.session.currentUser` was set, middleware creates a cookie 🍪  
+    }),                    //                         with the session id, and sends it in the HTTP response headers
     secret: process.env.SECRET_SESSION,
     resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 24 * 60 * 60 * 1000, },
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000, },
   }),
 );//    ║                 ⇈ 
 //      ║                 ║
@@ -69,25 +69,26 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-//      ║                     ⇈
-//      ║                     ║
-//      ║                     ║       
-//      ║                     ║
-//      ║                     ║
-//      ║                     ║
-//      ║  ROUTER MIDDLEWARE  ║   res.send()  ||  res.json()
-//      ⇊                     ║
-app.use('/auth', auth);// ════╣   ⬙ or  
-//                            ║
-//                            ║  next(Error)
-//                            ║
-//          ERROR HANDLING    ║
-//                            ⇊
-// catch 404 and forward to error handler
+//      ║                           ⇈
+//      ║                           ║
+//      ║                           ║       
+//      ║                           ║
+//      ║                           ║
+//      ║                           ║
+//      ║  ROUTER MIDDLEWARE        ║   res.send()  ||  res.json()
+//      ⇊                           ║
+app.use('/auth', authRouter);// ════╣   ⬙ or  
+//                                  ║
+//                                  ║  next(Error)
+//                                  ║
+//          ERROR HANDLING          ║
+//                                  ⇊
+// Catch 404 and respond with error message
 app.use((req, res, next) => {
   res.status(404).json({ code: 'not found' });
 });
 
+// Catch next(err) calls
 app.use((err, req, res, next) => {
   // always log the error
   console.error('ERROR', req.method, req.path, err);

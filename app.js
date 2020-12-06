@@ -9,7 +9,7 @@ const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
 require('dotenv').config();
 
-const auth = require('./routes/auth');
+const authRouter = require('./routes/auth.router');
 
 
 // MONGOOSE CONNECTION
@@ -47,13 +47,13 @@ app.use(
   session({
     store: new MongoStore({
       mongooseConnection: mongoose.connection,
-      ttl: 24 * 60 * 60, // 1 day
+      ttl: 30 * 24 * 60 * 60, // 30 days
     }),
     secret: process.env.SECRET_SESSION,
     resave: true,
     saveUninitialized: true,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     },
   }),
 );
@@ -67,15 +67,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // ROUTER MIDDLEWARE
-app.use('/auth', auth);
+app.use('/auth', authRouter);
 
 
 // ERROR HANDLING
-// catch 404 and forward to error handler
+//  Catch 404 and respond with error message
 app.use((req, res, next) => {
   res.status(404).json({ code: 'not found' });
 });
 
+// Catch next(err) calls
 app.use((err, req, res, next) => {
   // always log the error
   console.error('ERROR', req.method, req.path, err);
