@@ -36,10 +36,6 @@ const {
 //  - set status code 204 (No Content) and send the response back
 
 
-// GET '/auth/private'   --> Same as /me but it returns a message instead (Example only, no real use)
-//  - check if the user IS logged in using middleware (check if `req.session.currentUser` is set)
-//  - set status code and send the json message response back
-
 // GET '/auth/me'
 //  - check if the user Is logged in using middleware (check if `req.session.currentUser` is set)
 //  - if yes, send the response with user info (available on `req.session.currentUser`)
